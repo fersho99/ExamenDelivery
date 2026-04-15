@@ -2,13 +2,26 @@
 import './globals.css'
 import { Home, Search, User } from 'lucide-react'
 import CartPanel from '@/components/CartPanel';
-import CheckoutModal from '@/components/CheckoutModal'; // <-- IMPORTANTE: Importar el modal
+import CheckoutModal from '@/components/CheckoutModal';
+import Script from 'next/script'; // <-- 1. Importar el componente Script de Next.js
 
 export const metadata = { title: 'FoodieExpress' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
+      <head>
+        <Script id="microsoft-clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "wc8skq980p");
+          `}
+        </Script>
+      </head>
+      
       <body className="bg-zinc-950 text-zinc-200 h-screen overflow-hidden flex">
         
         <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col p-6">
@@ -34,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <CartPanel />
-        <CheckoutModal /> {/* <-- IMPORTANTE: Colocar el modal aquí */}
+        <CheckoutModal />
       </body>
     </html>
   )
