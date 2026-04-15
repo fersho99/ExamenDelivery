@@ -2,6 +2,7 @@
 import './globals.css'
 import { Home, Search, User } from 'lucide-react'
 import CartPanel from '@/components/CartPanel';
+import CheckoutModal from '@/components/CheckoutModal'; // <-- IMPORTANTE: Importar el modal
 
 export const metadata = { title: 'FoodieExpress' }
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <CartPanel />
+        <CheckoutModal /> {/* <-- IMPORTANTE: Colocar el modal aquí */}
       </body>
     </html>
   )
