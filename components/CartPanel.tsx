@@ -1,17 +1,40 @@
 "use client";
 import { useCart } from '@/store/useCard'; 
 import { formatMXN } from '@/lib/mockData';
-import { ShoppingCart, CreditCard } from 'lucide-react';
+import { ShoppingCart, CreditCard, ChevronDown, X } from 'lucide-react';
 
-export default function CartPanel() {
-  // Asegúrate de traer 'setModal' aquí
-  const { items, addItem, removeItem, total, setModal } = useCart();
+function Tooltip({ children, message }: { children: React.ReactNode; message: string }) {
+  return (
+    <div className="relative group">
+      {children}
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-zinc-800 text-zinc-300 text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 border border-zinc-700">
+        {message}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800" />
+      </div>
+    </div>
+  );
+}
+
+interface CartPanelProps {
+  isMobile?: boolean;
+  onClose?: () => void;
+}
+
+export default function CartPanel({ isMobile, onClose }: CartPanelProps) {
+  const { items, addItem, removeItem, total, setModal, cartAnimation, setRestaurant } = useCart();
 
   return (
-    <aside className="w-80 bg-zinc-900 border-l border-zinc-800 flex flex-col h-full shadow-2xl">
-      <div className="p-6 border-b border-zinc-800 flex items-center gap-3">
-        <ShoppingCart size={20} className="text-orange-500" />
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b border-zinc-800 flex items-center gap-3">
+        <div className={`text-orange-500 transition-transform ${cartAnimation ? 'scale-125' : ''}`}>
+          <ShoppingCart size={20} className={cartAnimation ? 'animate-bounce' : ''} />
+        </div>
         <h2 className="text-lg font-bold text-white tracking-tight">Tu Orden</h2>
+        {items.length > 0 && (
+          <span className="ml-auto bg-orange-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            {items.reduce((acc, i) => acc + i.quantity, 0)}
+          </span>
+        )}
       </div>
 
       <div className="flex-1 p-4 overflow-y-auto space-y-3">
@@ -37,8 +60,8 @@ export default function CartPanel() {
         )}
       </div>
 
-      <div className="p-6 border-t border-zinc-800 bg-zinc-900/50">
-        <div className="flex justify-between items-end mb-6">
+      <div className="p-4 border-t border-zinc-800 bg-zinc-900/50">
+        <div className="flex justify-between items-end mb-4">
           <span className="text-zinc-500 text-xs font-bold uppercase tracking-tighter">Total del Pedido</span>
           <p className="text-2xl font-black text-white">{formatMXN(total())}</p>
         </div>
@@ -47,22 +70,34 @@ export default function CartPanel() {
           <div className="relative group">
             <label className="text-[10px] text-zinc-500 uppercase font-black mb-1.5 block px-1">Método de Pago</label>
             <div className="relative">
-              <select className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 pl-10 text-zinc-300 text-sm appearance-none focus:border-orange-500 outline-none transition-all cursor-pointer">
+              <select className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 pl-10 pr-10 text-zinc-300 text-sm appearance-none focus:border-orange-500 outline-none transition-all cursor-pointer hover:border-zinc-700">
                 <option value="transfer">Pago con Tarjeta</option>
                 <option value="cash">Efectivo al recibir</option>
               </select>
               <CreditCard size={16} className="absolute left-3.5 top-3.5 text-zinc-500 group-focus-within:text-orange-500" />
+              <ChevronDown size={16} className="absolute right-3.5 top-3.5 text-zinc-500 pointer-events-none" />
             </div>
           </div>
-          <button 
-            onClick={() => setModal(true)} // AHORA SÍ FUNCIONARÁ PERFECTO
-            disabled={items.length === 0}
-            className="w-full bg-orange-600 hover:bg-orange-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-black py-4 rounded-xl transition-all"
-          >
-            Confirmar Pedido
-          </button>
+          
+          {items.length === 0 ? (
+            <Tooltip message="Agrega productos a tu orden para continuar">
+              <button 
+                disabled
+                className="w-full bg-zinc-800 text-zinc-600 font-black py-4 rounded-xl cursor-not-allowed"
+              >
+                Confirmar Pedido
+              </button>
+            </Tooltip>
+          ) : (
+            <button 
+              onClick={() => { setRestaurant(null); setModal(true); }}
+              className="w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-xl transition-all hover:shadow-lg hover:shadow-orange-600/20 active:scale-[0.98]"
+            >
+              Confirmar Pedido
+            </button>
+          )}
         </div>
       </div>
-    </aside>
+    </div>
   );
 }

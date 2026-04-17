@@ -9,12 +9,14 @@ interface CartStore {
   currentRestaurant: Restaurant | null;
   isModalOpen: boolean;
   isOrderPlaced: boolean;
+  cartAnimation: boolean;
   addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   setRestaurant: (rest: Restaurant | null) => void;
   setModal: (open: boolean) => void;
   placeOrder: () => void;
   total: () => number;
+  triggerCartAnimation: () => void;
 }
 
 export const useCart = create<CartStore>((set, get) => ({
@@ -22,6 +24,7 @@ export const useCart = create<CartStore>((set, get) => ({
   currentRestaurant: null,
   isModalOpen: false,
   isOrderPlaced: false,
+  cartAnimation: false,
 
   addItem: (product) => {
     const items = get().items;
@@ -29,8 +32,9 @@ export const useCart = create<CartStore>((set, get) => ({
     if (existing) {
       set({ items: items.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i) });
     } else {
-      set({ items: [...items, { ...product, quantity: 1 }] });
+      set({ items: [...items, { ...product, quantity: 1 }], cartAnimation: true });
     }
+    setTimeout(() => set({ cartAnimation: false }), 300);
   },
   removeItem: (id) => {
     const items = get().items;
@@ -50,4 +54,8 @@ export const useCart = create<CartStore>((set, get) => ({
     }, 3000);
   },
   total: () => get().items.reduce((acc, item) => acc + item.price * item.quantity, 0),
+  triggerCartAnimation: () => {
+    set({ cartAnimation: true });
+    setTimeout(() => set({ cartAnimation: false }), 300);
+  },
 }));
